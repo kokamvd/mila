@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: MilaLevchuk
+  version: 0.1.0
+  description: |
+    API организовано по принципам REST. Контент передается в формате JSON. Частота запросов не дложна превышать 10 в секунду.
+  x-logo:
+    url: './milalogo.png'
+    altText: MilaLevchuk
+servers:
+  - url: 'https://local.milalevchuk.ru/rest'
+    description: dev-local
+  - url: 'https://milalevchuk.ru/rest'
+    description: Prodaction
+#x-tagGroups:
+#  - name: General
+#    tags:
+#      - pet
+#      - store
+#  - name: User Management
+#    tags:
+#      - user
+#  - name: Models
+#    tags:
+#      - pet_model
+#      - store_model
+paths:
+  /pays:
+    get:
+      summary: Получить список платежей
+      description: |
+        Получает список платежей. Все параметры запроса не обязательны.
+
+        Ограничить выборку можно с помощью параметров `limit` и `start`.
+
+        Фильтрация доступна по всем полям, кроме `roistat_visit`. Одновременно в фильтре участвует одно поле.
+        Формат даты `2019-09-06T00:58:34`, все даты в часовом поясе Москвы UTC+3:00.
+
+        Для фильтрации задаются три параметра, например, `filter=updatedon&filterType=gt&filterValue=2019-09-06T00:55:00`
+        Если `filterType` принимает `null` или `notnull`, `filterValue` задавать нет необходимости.
+        Допустимые значения и эквивалентные операторы:
+
+        ```
+        'eq' = '=',
+        'ne' = '!=',
+        'gt' = '>',
+        'ge' = '>=',
+        'lt' = '<',
+        'le' = '<=',
+        'null' = 'IS NULL',
+        'notnull' = 'IS NOT NULL'
+        ```
+      tags:
+        - Платежи
+      parameters:
+        - schema:
+            type: integer
+            default: 100
+            minimum: 1
+          in: query
+          name: limit
+          description: Ограничение количества возвращаемых записей
+        - schema:
+            type: integer
+          in: query
+          name: start
+          description: Стартовая запись (смещение) для выборки
+        - schema:
+            type: string
+            default: id
+          in: query
+          name: sort
+          description: Поле для сортировки
+        - schema:
+            type: string
+            default: DESC
+            enum:
+              - DESC
+              - ASC
+          in: query
+          name: dir
+          description: Направление сортировки
+        - schema:
+            type: string
+          in: query
+          name: filter
+          description: Поле для фильтрации
+        - schema:
+            type: string
+            enum:
+              - eq
+              - ne
+              - gt
+              - ge
+              - lt
+              - le
+              - 'null'
+              - notnull
+            default: gt
+          in: query
+          name: filterType
+          description: Оператор фильтра
+        - schema:
+            type: string
+          in: query
+          name: filterValue
+          description: Операнд фильтра
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Pay'
+                  total:
+                    type: integer
+                    description: 'Общее количество платежей, удовлетворяющих условиям фильтрации и поиска'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  object:
+                    type: object
+                  success:
+                    type: boolean
+                    default: false
+                  errors:
+                    type: object
+              example:
+                message: Something wrong
+                object: []
+                success: false
+                errors:
+                  filterType: Wrong filter operator
