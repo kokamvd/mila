@@ -51,3 +51,15 @@ example:
   id: 857310
   name: ''
   email: asdf@gmail.com
+  phone: '+79623333357'
+  cost: 1040
+  received: null
+  success: 0
+  credit: null
+  linked: 84328
+  createdon: '2019-09-06 00:58:34'
+  createdby: 79436
+  confirmedon: null
+  formId: store
+  updatedon: '2019-09-06 00:58:34'
+  roistat_visit: '123123'

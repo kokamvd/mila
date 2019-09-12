@@ -2,14 +2,19 @@ openapi: 3.0.0
 info:
   title: MilaLevchuk
   version: 0.1.0
+  contact:
+    name: API Support
+    email: kokamvd@gmail.com
   description: |
     API организовано по принципам REST. Контент передается в формате JSON. Частота запросов не дложна превышать 10 в секунду.
+
+    # Версионность
+
+    Версионность API придерживается спецификации [Semantic Versioning 2](https://semver.org)
   x-logo:
     url: './milalogo.png'
     altText: MilaLevchuk
 servers:
-  - url: 'https://local.milalevchuk.ru/rest'
-    description: dev-local
   - url: 'https://milalevchuk.ru/rest'
     description: Prodaction
 #x-tagGroups:
@@ -29,7 +34,7 @@ paths:
     get:
       summary: Получить список платежей
       description: |
-        Получает список платежей. Все параметры запроса не обязательны.
+        Возвращает список платежей. Все параметры запроса не обязательны.
 
         Ограничить выборку можно с помощью параметров `limit` и `start`.
 
@@ -142,3 +147,36 @@ paths:
                 success: false
                 errors:
                   filterType: Wrong filter operator
+  /paystatuses:
+    get:
+      summary: Получить список статусов платежей
+      description: Возвращает список всех возможных статусов платежа
+      tags:
+        - Платежи
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                  total:
+                    type: string
+                    description: 'Общее количество статусов'
+              example:
+                results:
+                  '0': 'Не оплачен'
+                  '1': 'Оплачен'
+                  '2': 'На подтверждении'
+                  '-1': 'Возврат'
+                  '-2': 'Отказ'
+                  '-3': 'Ожидание возврата'
+                total: 6
