@@ -2,18 +2,18 @@
   "openapi": "3.0.0",
   "info": {
     "title": "MilaLevchuk",
-    "version": "0.1.0",
-    "description": "API организовано по принципам REST. Контент передается в формате JSON. Частота запросов не дложна превышать 10 в секунду.\n",
+    "version": "0.2.0",
+    "contact": {
+      "name": "API Support",
+      "email": "kokamvd@gmail.com"
+    },
+    "description": "API организовано по принципам REST. Контент передается в формате JSON. Частота запросов не дложна превышать 10 в секунду.\n\n# Версионность\n\nВерсионность API придерживается спецификации [Semantic Versioning 2](https://semver.org)\n",
     "x-logo": {
       "url": "./milalogo.png",
       "altText": "MilaLevchuk"
     }
   },
   "servers": [
-    {
-      "url": "https://local.milalevchuk.ru/rest",
-      "description": "dev-local"
-    },
     {
       "url": "https://milalevchuk.ru/rest",
       "description": "Prodaction"
@@ -23,7 +23,7 @@
     "/pays": {
       "get": {
         "summary": "Получить список платежей",
-        "description": "Получает список платежей. Все параметры запроса не обязательны.\n\nОграничить выборку можно с помощью параметров `limit` и `start`.\n\nФильтрация доступна по всем полям, кроме `roistat_visit`. Одновременно в фильтре участвует одно поле.\nФормат даты `2019-09-06T00:58:34`, все даты в часовом поясе Москвы UTC+3:00.\n\nДля фильтрации задаются три параметра, например, `filter=updatedon&filterType=gt&filterValue=2019-09-06T00:55:00`\nЕсли `filterType` принимает `null` или `notnull`, `filterValue` задавать нет необходимости.\nДопустимые значения и эквивалентные операторы:\n\n```\n'eq' = '=',\n'ne' = '!=',\n'gt' = '>',\n'ge' = '>=',\n'lt' = '<',\n'le' = '<=',\n'null' = 'IS NULL',\n'notnull' = 'IS NOT NULL'\n```\n",
+        "description": "Возвращает список платежей. Все параметры запроса не обязательны.\n\nОграничить выборку можно с помощью параметров `limit` и `start`.\n\nФильтрация доступна по всем полям, кроме `roistat_visit`. Одновременно в фильтре участвует одно поле.\nФормат даты `2019-09-06T00:58:34`, все даты в часовом поясе Москвы UTC+3:00.\n\nДля фильтрации задаются три параметра, например, `filter=updatedon&filterType=gt&filterValue=2019-09-06T00:55:00`\nЕсли `filterType` принимает `null` или `notnull`, `filterValue` задавать нет необходимости.\nДопустимые значения и эквивалентные операторы:\n\n```\n'eq' = '=',\n'ne' = '!=',\n'gt' = '>',\n'ge' = '>=',\n'lt' = '<',\n'le' = '<=',\n'null' = 'IS NULL',\n'notnull' = 'IS NOT NULL'\n```\n",
         "tags": [
           "Платежи"
         ],
@@ -162,6 +162,55 @@
           }
         }
       }
+    },
+    "/paystatuses": {
+      "get": {
+        "summary": "Получить список статусов платежей",
+        "description": "Возвращает список всех возможных статусов платежа",
+        "tags": [
+          "Платежи"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "total": {
+                      "type": "string",
+                      "description": "Общее количество статусов"
+                    }
+                  }
+                },
+                "example": {
+                  "results": {
+                    "0": "Не оплачен",
+                    "1": "Оплачен",
+                    "2": "На подтверждении",
+                    "-1": "Возврат",
+                    "-2": "Отказ",
+                    "-3": "Ожидание возврата"
+                  },
+                  "total": 6
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -235,7 +284,19 @@
         "example": {
           "id": 857310,
           "name": "",
-          "email": "asdf@gmail.com"
+          "email": "asdf@gmail.com",
+          "phone": "+79623333357",
+          "cost": 1040,
+          "received": null,
+          "success": 0,
+          "credit": null,
+          "linked": 84328,
+          "createdon": "2019-09-06 00:58:34",
+          "createdby": 79436,
+          "confirmedon": null,
+          "formId": "store",
+          "updatedon": "2019-09-06 00:58:34",
+          "roistat_visit": "123123"
         }
       }
     },
