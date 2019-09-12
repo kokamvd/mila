@@ -1,0 +1,53 @@
+title: Pay
+description: Платежный счет. Создается при каждом переходе пользователя в платежную систему.
+type: object
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+    description: Имя плательщика
+  email:
+    type: string
+  phone:
+    type: string
+  cost:
+    type: number
+    description: Стоимость
+  received:
+    type: number
+    description: Получено средств (после вычета комиссии)
+    nullable: true
+  success:
+    type: integer
+    description: Статус платежа
+  credit:
+    type: integer
+    description: id связанной рассрочки пользователя
+    nullable: true
+  linked:
+    type: integer
+    description: id заказа в магазине (если платеж из магазина)
+  createdon:
+    type: string
+    description: Дата создания я платежа
+  createdby:
+    description: 'id пользователя, если зарегистрирован'
+    type: integer
+  confirmedon:
+    type: string
+    description: Дата подтверждения оплаты платежа
+    nullable: true
+  formId:
+    type: string
+    description: Идентификатор платежной формы
+  updatedon:
+    type: string
+    description: Дата последнего обновления платежа. Заполняется изначально датой создания платежа
+  roistat_visit:
+    type: string
+    description: 'Идентификатор визита, полученный из счетчика Roistat'
+example:
+  id: 857310
+  name: ''
+  email: asdf@gmail.com

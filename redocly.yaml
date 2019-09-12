@@ -1,6 +1,6 @@
 
 apiTitle: MilaLevchuk
-splitSpec: false
+splitSpec: true
 codeSamples: true
 swaggerUI: true
 travis: false
