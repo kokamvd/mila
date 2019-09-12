@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: MilaLevchuk
-  version: 0.2.0
+  version: 0.3.0
   contact:
     name: API Support
     email: kokamvd@gmail.com
@@ -151,11 +151,8 @@ paths:
                 properties:
                   results:
                     type: object
-                    properties:
-                      id:
-                        type: integer
-                      name:
-                        type: string
+                    additionalProperties:
+                      type: string
                   total:
                     type: string
                     description: Общее количество статусов
@@ -168,6 +165,45 @@ paths:
                   '-2': Отказ
                   '-3': Ожидание возврата
                 total: 6
+  /payfields:
+    get:
+      summary: Получить список полей платежа
+      description: Возвращает список полей платежа
+      tags:
+        - Платежи
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  total:
+                    type: integer
+                    description: Общее количество полей
+              example:
+                results:
+                  '1': id
+                  '2': name
+                  '3': email
+                  '4': phone
+                  '5': cost
+                  '6': received
+                  '7': success
+                  '8': credit
+                  '9': linked
+                  '10': createdon
+                  '11': createdby
+                  '12': confirmedon
+                  '13': formId
+                  '14': updatedon
+                  '15': roistat_visit
+                total: 15
 components:
   schemas:
     Pay:
