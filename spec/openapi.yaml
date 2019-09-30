@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: MilaLevchuk
-  version: 0.3.0
+  version: 0.4.0
   contact:
     name: API Support
     email: kokamvd@gmail.com
@@ -32,6 +32,8 @@ servers:
 paths:
   /pays:
     get:
+      security:
+        - SecretApiKey: []
       summary: Получить список платежей
       description: |
         Возвращает список платежей. Все параметры запроса не обязательны.
@@ -149,6 +151,8 @@ paths:
                   filterType: Wrong filter operator
   /paystatuses:
     get:
+      security:
+        - SecretApiKey: []
       summary: Получить список статусов платежей
       description: Возвращает список всех возможных статусов платежа
       tags:
@@ -179,6 +183,8 @@ paths:
                 total: 6
   /payfields:
     get:
+      security:
+        - SecretApiKey: []
       summary: Получить список полей платежа
       description: Возвращает список полей платежа
       tags:
@@ -216,3 +222,255 @@ paths:
                    14: updatedon
                    15: roistat_visit
                 total: 15
+  /roistat?action=import_scheme:
+    get:
+      security:
+        - UserToken: []
+      summary: Выгрузка информации о статусах и дополнительных полях
+      description: Этот запрос нужно настроить до этапа “Отправка данных в CRM-систему”, так как он необходим для корректной работы всей интеграции
+      tags:
+        - Roistat
+      parameters:
+        - name: action
+          schema:
+            type: string
+            enum:
+             - import_scheme
+          required: true
+          in: query
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statuses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                  fields:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+              example:
+                statuses:
+                  - id: 0
+                    name: 'Не оплачен'
+                  - id: 1
+                    name: 'Оплачен'
+                  - id: 2
+                    name: 'На подтверждении'
+                  - id: -1
+                    name: 'Возврат'
+                  - id: -2
+                    name: 'Отказ'
+                  - id: -3
+                    name: 'Ожидание возврата'
+                fields:
+                  - id: 1
+                    name: 'Email'
+                  - id: 2
+                    name: 'Телефон'
+                  - id: 3
+                    name: 'Получено денег'
+                  - id: 4
+                    name: 'Рассрочка'
+                  - id: 5
+                    name: 'Связь'
+                  - id: 6
+                    name: 'Дата оплаты'
+                  - id: 7
+                    name: 'Платежная форма'
+  /roistat?action=export:
+    get:
+      security:
+        - UserToken: []
+      summary: Выгрузка информации о платежах
+      description: Список платежей и параметры пагинации выборки. Даты в часовом поясе UTC+0
+      tags:
+        - Roistat
+      parameters:
+        - name: action
+          schema:
+            type: string
+            enum:
+              - export
+          required: true
+          in: query
+        - name: date
+          schema:
+            type: integer
+          in: query
+          description: дата в формате UNIX-time, после которой были изменения в сделках
+        - name: limit
+          schema:
+            type: integer
+            default: 100
+          in: query
+          description: количество выгружаемых сделок
+        - name: offset
+          schema:
+            type: integer
+            default: 0
+          in: query
+          description: количество заявок от начала выборки, которые нужно пропустить
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        date_create:
+                          type: integer
+                          description: Дата создания сделки в формате UNIX-time в часовом поясе UTC+0
+                        status:
+                          type: integer
+                          description: Уникальный идентификатор статуса из массива statuses
+                        price:
+                          type: number
+                        roistat:
+                          type: string
+                          description: Номер визита, сохраненный у сделки. Значение cookie roistat_visit. Используется для определения источника сделки
+                        client_id:
+                          type: integer
+                          description: идентификатор пользователя
+                        fields:
+                          type: object
+                          description: Массив дополнительных полей сделки
+                          additionalProperties:
+                            type: string
+                  pagination:
+                    type: object
+                    description: устанавливает лимит выгрузки заявок за один запрос
+                    properties:
+                      total_count:
+                        type: integer
+                        description: Количество заявок, которые были изменены после заданной даты
+                      limit:
+                        type: integer
+                        description: Количествово заявок, которое будет выгружаться за один запрос
+              example:
+                orders:
+                  id: 873324
+                  name: "Катя"
+                  date_create: 1569863221
+                  status: 0
+                  price: 249
+                  roistat: "481588"
+                  client_id: 92655
+                  fields:
+                    "1": "katja.n@bk.ru"
+                    "2": ""
+                    "3": null
+                    "4": null
+                    "5": null
+                    "6": null
+                    "7": "marathon2"
+                pagination:
+                  total_count: 154
+                  limit: 10
+  /roistat?action=export_clients:
+    get:
+      security:
+        - UserToken: []
+      summary: Выгрузка информации о клиентах
+      description: Список пользователей и параметры пагинации выборки. Даты в часовом поясе UTC+0
+      tags:
+        - Roistat
+      parameters:
+        - name: action
+          schema:
+            type: string
+            enum:
+              - export_clients
+          required: true
+          in: query
+        - name: date
+          schema:
+            type: integer
+          in: query
+          description: дата в формате UNIX-time, после которой были созданы пользователи
+        - name: limit
+          schema:
+            type: integer
+            default: 100
+          in: query
+          description: количество выгружаемых пользователей
+        - name: offset
+          schema:
+            type: integer
+            default: 0
+          in: query
+          description: количество пользователей от начала выборки, которые нужно пропустить
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clients:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        phone:
+                          type: string
+                        email:
+                          type: string
+                        birth_date:
+                          type: string
+                          description: День рождения (В формате Y-m-d)
+                  pagination:
+                    type: object
+                    description: устанавливает лимит выгрузки пользователей за один запрос
+                    properties:
+                      total_count:
+                        type: integer
+                        description: Количество пользователей, которые были созданы после заданной даты
+                      limit:
+                        type: integer
+                        description: Количествово пользователей, которое будет выгружаться за один запрос
+              example:
+                clients:
+                  - id: 249310
+                    name: "baasdfuldfa996@gmail.com"
+                    phone: ""
+                    email: "baasdfuldfa996@gmail.com"
+                    birth_date: ""
+                  - id: 249308
+                    name: "kubsdddde@mail.ru"
+                    phone: "89331440697"
+                    email: "kubsdddde@mail.ru"
+                    birth_date: "1977-09-08"
+                pagination:
+                  total_count: 35
+                  limit: 10

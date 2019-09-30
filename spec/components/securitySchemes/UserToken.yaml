@@ -1,0 +1,10 @@
+type: apiKey
+in: query
+name: user, token
+description: |
+  Для методов Roistat.
+  Передается два параметра:
+
+  **user** - имя пользователя в CRM
+
+  **token** - имя пользователя и пароль в CRM, сгенерированные в md5 в формате $username . $password
